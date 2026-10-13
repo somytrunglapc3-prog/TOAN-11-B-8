@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BÀI 8: MẪU SỐ LIỆU GHÉP NHÓM (CHUẨN SƯ PHẠM)</title>
+    
+    <script>
+        window.MathJax = { 
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], processEscapes: true },
+            svg: { fontCache: 'global' },
+            startup: { typeset: true }
+        };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #0056b3; --secondary: #eef2f5; --text: #333;
+            --correct: #d4edda; --correct-border: #c3e6cb;
+            --incorrect: #f8d7da; --incorrect-border: #f5c6cb;
+            --font-size: 14pt; --illu-size: 240px; 
+        }
+        * { box-sizing: border-box; } 
+        body { font-family: 'Segoe UI', sans-serif; font-size: var(--font-size); line-height: 1.6; color: var(--text); max-width: 950px; margin: 0 auto; padding: 10px 20px; background-color: #f4f7f6; transition: max-width 0.3s ease, font-size 0.2s ease; overflow-x: hidden; }
+        h1, h2, h3, h4 { color: var(--primary); margin-top: 0; }
+        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; width: 100%;}
+        .theory-box { border-left: 5px solid var(--primary); }
+        .theory-section { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 15px;}
+        .theory-section:last-child { border-bottom: none; }
+        .theory-content { flex: 1 1 55%; min-width: 250px; padding-right: 15px; }
+        .theory-illu { flex: 0 0 var(--illu-size); width: var(--illu-size); text-align: center; background: #fafbfc; border-radius: 8px; padding: 10px; border: 1px solid #e2e2e2; transition: all 0.3s ease; }
+        .theory-illu svg { width: 100%; height: auto; display: block; margin: 0 auto; }
+        .theory-illu span { display: block; font-size: 0.8em; color: #666; font-style: italic; margin-top: 5px; }
+        .control-panel { background: var(--secondary); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 9999; box-shadow: 0 6px 10px rgba(0,0,0,0.15); border: 2px solid var(--primary); padding: 8px 10px !important; font-size: 0.85em; }
+        .control-panel label { font-weight: bold; white-space: nowrap; }
+        .control-panel input { width: 45px; padding: 3px; text-align: center; border: 1px solid #ccc; border-radius: 4px; font-size: inherit;}
+        .control-panel button { padding: 5px 10px; font-size: inherit; } 
+        button { background-color: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.3s; font-size: inherit; }
+        button:hover { background-color: #004494; transform: translateY(-1px); }
+        button.submit-btn { background-color: #28a745; font-size: 1.1em; padding: 12px 25px; margin-top: 15px; width: 100%;}
+        button.submit-btn:hover { background-color: #218838; }
+        .font-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; margin-right: 5px; border-right: 2px solid #ccc; padding-right: 10px; }
+        button.font-btn { background-color: #6c757d; padding: 4px 8px; }
+        button.font-btn:hover { background-color: #5a6268; }
+        .scroll-area { padding: 5px; }
+        .table-responsive { width: 100%; overflow-x: auto; margin: 10px 0; display: block; -webkit-overflow-scrolling: touch; }
+        .question { margin-top: 15px; padding: 15px; border: 1px solid #e2e2e2; border-radius: 8px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+        .options { list-style-type: none; padding-left: 0; margin-top: 10px; }
+        .options li { padding: 8px; margin-bottom: 5px; border-radius: 4px; border: 1px solid transparent; transition: 0.2s;}
+        .options label { cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%;}
+        input[type="radio"] { width: 1.5em; height: 1.5em; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
+        .tf-table { width: 100%; border-collapse: collapse; min-width: 500px; text-align: center; }
+        .tf-table th, .tf-table td { border: 1px solid #ddd; padding: 10px; vertical-align: middle; }
+        .tf-table td:first-child { text-align: left; }
+        .short-ans-input { padding: 6px; width: 140px; text-align: center; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; font-size: inherit;}
+        .is-correct { background-color: var(--correct) !important; border-color: var(--correct-border) !important; }
+        .is-incorrect { background-color: var(--incorrect) !important; border-color: var(--incorrect-border) !important; }
+        .feedback { font-weight: bold; margin-left: 10px; font-size: 0.9em; }
+        .feedback.text-correct { color: #155724; }
+        .feedback.text-incorrect { color: #721c24; }
+        .advice-box { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 1.1em; display: none; }
+        @media (max-width: 900px) {
+            .control-panel { flex-direction: row; gap: 6px; padding: 6px !important; }
+            .font-controls { border-right: none; border-bottom: 1px solid #ccc; padding-bottom: 6px; margin-bottom: 2px; width: 100%; justify-content: center; margin-right: 0;}
+            .box { padding: 10px; }
+            body { padding: 2px; }
+            .theory-illu { flex: 1 1 100%; max-width: var(--illu-size); margin: 15px auto 0 auto; }
+            .theory-content { padding-right: 0; min-width: 100%; }
+            .tf-table { min-width: 100%; font-size: 0.9em; } 
+            .question { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px; } 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="box control-panel">
+        <div class="font-controls">
+            <button class="font-btn" onclick="toggleFullScreen()" title="Bật/Tắt chế độ Toàn Màn Hình (F11)">📺 Toàn màn hình</button>
+            <button class="font-btn" onclick="toggleWidth()" title="Phóng to/Thu nhỏ khung viền trang web">↔️ Đổi khung</button>
+            <span style="margin: 0 5px; color: #ccc;">|</span>
+            <label>Cỡ chữ:</label>
+            <button class="font-btn" onclick="changeFontSize(-2)">A-</button>
+            <span id="font-size-display" style="font-weight: bold; width: 40px; text-align: center;">14pt</span>
+            <button class="font-btn" onclick="changeFontSize(2)">A+</button>
+            <span style="margin: 0 5px; color: #ccc;">|</span>
+            <label>Cỡ hình:</label>
+            <button class="font-btn" onclick="changeIlluSize(-30)">-</button>
+            <span id="illu-size-display" style="font-weight: bold; width: 45px; text-align: center;">240px</span>
+            <button class="font-btn" onclick="changeIlluSize(30)">+</button>
+        </div>
+        <label>Dạng 1 (4 PA): <input type="number" id="numType1" value="4" min="0" max="20"></label>
+        <label>Dạng 2 (Đ/S): <input type="number" id="numType2" value="3" min="0" max="5"></label>
+        <label>Dạng 3 (Ngắn): <input type="number" id="numType3" value="2" min="0" max="15"></label>
+        <button onclick="generateTest()">TẠO ĐỀ CHUYÊN SÂU</button>
+    </div>
+
+    <div class="box theory-box">
+        <h1 style="margin-bottom: 5px;">BÀI 8: MẪU SỐ LIỆU GHÉP NHÓM</h1>
+        <div style="text-align: right; font-style: italic; color: var(--primary); font-weight: bold; border-bottom: 1px dashed #ccc; padding-bottom: 15px; margin-bottom: 15px;">
+            Giáo viên: NGUYỄN VĂN SÔ
+        </div>
+
+        <!-- Section 1 -->
+        <div class="theory-section">
+            <div class="theory-content">
+                <h3>1. Định nghĩa về mẫu số liệu ghép nhóm</h3>
+                <ul>
+                    <li><strong>Mẫu số liệu ghép nhóm</strong> là mẫu số liệu cho dưới dạng bảng tần số của các nhóm số liệu.</li>
+                    <li>Mỗi nhóm số liệu là tập hợp gồm các giá trị của số liệu được ghép nhóm theo một tiêu chí xác định.</li>
+                    <li>Nhóm số liệu thường được cho dưới dạng <strong>$[a; b)$</strong>, trong đó $a$ là đầu mút trái (thuộc nhóm), $b$ là đầu mút phải (không thuộc nhóm).</li>
+                </ul>
+            </div>
+            <div class="theory-illu">
+                <svg viewBox="0 0 200 120">
+                    <rect x="20" y="20" width="160" height="80" fill="#f8f9fa" stroke="#ccc" stroke-width="1.5" rx="5"/>
+                    <line x1="20" y1="50" x2="180" y2="50" stroke="#ccc" stroke-width="1.5"/>
+                    <line x1="100" y1="20" x2="100" y2="100" stroke="#ccc" stroke-width="1.5"/>
+                    <text x="60" y="40" font-size="12" font-weight="bold" text-anchor="middle">Nhóm</text>
+                    <text x="140" y="40" font-size="12" font-weight="bold" text-anchor="middle">Tần số</text>
+                    <text x="60" y="70" font-size="12" text-anchor="middle" fill="var(--primary)">[a; b)</text>
+                    <text x="140" y="70" font-size="12" text-anchor="middle">m</text>
+                    <text x="60" y="90" font-size="12" text-anchor="middle" fill="var(--primary)">[b; c)</text>
+                    <text x="140" y="90" font-size="12" text-anchor="middle">n</text>
+                </svg>
+                <span>Minh hoạ bảng tần số ghép nhóm</span>
+            </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="theory-section">
+            <div class="theory-content">
+                <h3>2. Nhận xét và Ứng dụng</h3>
+                <ul>
+                    <li>Mẫu số liệu ghép nhóm được dùng khi ta <strong>không thể thu thập được số liệu chính xác</strong> hoặc do yêu cầu bài toán phải biểu diễn dữ liệu ghép nhóm để thuận lợi cho việc tổ chức, đọc và phân tích số liệu.</li>
+                    <li>Trong một số trường hợp, <strong>nhóm số liệu cuối cùng</strong> có thể lấy đầu mút bên phải (dạng $[a; b]$).</li>
+                </ul>
+            </div>
+            <div class="theory-illu">
+                <svg viewBox="0 0 220 100">
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="black" />
+                        </marker>
+                    </defs>
+                    <!-- Truc so -->
+                    <line x1="10" y1="60" x2="210" y2="60" stroke="black" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <!-- Nhom 1 -->
+                    <circle cx="50" cy="60" r="4" fill="black"/> <!-- Ngoac vuong -->
+                    <circle cx="110" cy="60" r="4" fill="white" stroke="black" stroke-width="1.5"/> <!-- Ngoac tron -->
+                    <line x1="50" y1="60" x2="110" y2="60" stroke="var(--primary)" stroke-width="3"/>
+                    <text x="80" y="45" font-size="11" font-weight="bold" fill="var(--primary)">[ a ; b )</text>
+                    
+                    <!-- Nhom cuoi cung -->
+                    <circle cx="120" cy="60" r="4" fill="black"/> 
+                    <circle cx="180" cy="60" r="4" fill="black"/> <!-- Ngoac vuong -->
+                    <line x1="120" y1="60" x2="180" y2="60" stroke="#28a745" stroke-width="3"/>
+                    <text x="150" y="45" font-size="11" font-weight="bold" fill="#28a745">[ c ; d ]</text>
+                    
+                    <text x="100" y="85" font-size="9" fill="#555">Nhóm cuối có thể lấy cả 2 mút</text>
+                </svg>
+                <span>Biểu diễn khoảng / đoạn trên trục số</span>
+            </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="theory-section">
+            <div class="theory-content">
+                <h3>3. Các bước ghép nhóm mẫu số liệu</h3>
+                <p>Để chuyển mẫu số liệu không ghép nhóm sang ghép nhóm, ta làm như sau:</p>
+                <ul>
+                    <li><strong>Bước 1:</strong> Chia miền giá trị của mẫu số liệu thành một số nhóm theo tiêu chí cho trước.</li>
+                    <li><strong>Bước 2:</strong> Đếm số giá trị của mẫu số liệu thuộc mỗi nhóm (tần số) và lập bảng thống kê cho mẫu số liệu ghép nhóm.</li>
+                </ul>
+            </div>
+            <div class="theory-illu">
+                <svg viewBox="0 0 200 140">
+                    <rect x="50" y="10" width="100" height="30" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2" rx="4"/>
+                    <text x="100" y="30" font-size="11" font-weight="bold" text-anchor="middle">Dữ liệu thô</text>
+                    
+                    <line x1="100" y1="40" x2="100" y2="60" stroke="black" stroke-width="2" marker-end="url(#arrow)"/>
+                    
+                    <rect x="30" y="60" width="140" height="30" fill="#bae6fd" stroke="#7dd3fc" stroke-width="2" rx="4"/>
+                    <text x="100" y="80" font-size="11" font-weight="bold" text-anchor="middle">B1: Chia miền & Nhóm</text>
+                    
+                    <line x1="100" y1="90" x2="100" y2="110" stroke="black" stroke-width="2" marker-end="url(#arrow)"/>
+                    
+                    <rect x="30" y="110" width="140" height="30" fill="#bbf7d0" stroke="#86efac" stroke-width="2" rx="4"/>
+                    <text x="100" y="130" font-size="11" font-weight="bold" text-anchor="middle">B2: Đếm & Lập Bảng</text>
+                </svg>
+                <span>Quy trình tạo mẫu dữ liệu ghép nhóm</span>
+            </div>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="theory-section">
+            <div class="theory-content">
+                <h3>4. Chú ý quan trọng khi chia nhóm</h3>
+                <ul>
+                    <li><strong>Độ dài của nhóm</strong> $[a; b)$ được tính bằng <strong>$b - a$</strong>.</li>
+                    <li>Không nên chia thành quá nhiều nhóm hoặc quá ít nhóm.</li>
+                    <li>Các nhóm <strong>không giao nhau</strong>, các nhóm <strong>nên có độ dài như nhau</strong>.</li>
+                    <li><strong>Tổng độ dài các nhóm</strong> phải lớn hơn <strong>khoảng biến thiên</strong> (Giá trị Max - Giá trị Min của mẫu).</li>
+                </ul>
+            </div>
+            <div class="theory-illu">
+                <svg viewBox="0 0 240 100">
+                    <line x1="10" y1="50" x2="230" y2="50" stroke="#888" stroke-width="1.5" stroke-dasharray="2,2"/>
+                    
+                    <!-- Nhóm độ dài bằng nhau -->
+                    <rect x="30" y="40" width="50" height="20" fill="rgba(0,86,179,0.2)" stroke="var(--primary)" stroke-width="1.5"/>
+                    <rect x="80" y="40" width="50" height="20" fill="rgba(40,167,69,0.2)" stroke="#28a745" stroke-width="1.5"/>
+                    <rect x="130" y="40" width="50" height="20" fill="rgba(220,53,69,0.2)" stroke="#dc3545" stroke-width="1.5"/>
+                    
+                    <text x="55" y="30" font-size="10" text-anchor="middle">L</text>
+                    <text x="105" y="30" font-size="10" text-anchor="middle">L</text>
+                    <text x="155" y="30" font-size="10" text-anchor="middle">L</text>
+
+                    <!-- Khoảng biến thiên -->
+                    <line x1="30" y1="75" x2="30" y2="85" stroke="black" stroke-width="1.5"/>
+                    <line x1="170" y1="75" x2="170" y2="85" stroke="black" stroke-width="1.5"/>
+                    <line x1="30" y1="80" x2="170" y2="80" stroke="black" stroke-width="1.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+                    <text x="100" y="95" font-size="10" font-weight="bold" text-anchor="middle">Khoảng biến thiên R &lt; 3L</text>
+                </svg>
+                <span>Độ dài nhóm và khoảng biến thiên</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- KHU VỰC THI -->
+    <div id="output" class="box" style="display: none;">
+        <h2 style="text-align: center; margin-bottom: 15px;">ĐỀ KIỂM TRA ĐÁNH GIÁ NĂNG LỰC THỐNG KÊ</h2>
+        <div class="scroll-area" id="test-content"></div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="submit-btn" onclick="checkAnswers()" id="submitBtn" style="display:none;">NỘP BÀI & CHẤM ĐIỂM</button>
+        </div>
+        <h3 id="score-display" style="text-align: center; color: #0056b3; margin-top: 15px;"></h3>
+        <div id="advice-display" class="advice-box"></div>
+    </div>
+
+    <script>
+        // --- HỆ THỐNG ĐIỀU KHIỂN GIAO DIỆN ---
+        let currentFontSize = 14; let currentIlluSize = 240; let isExpanded = false;
+        function changeFontSize(delta) { currentFontSize += delta; if (currentFontSize < 10) currentFontSize = 10; if (currentFontSize > 32) currentFontSize = 32; document.documentElement.style.setProperty('--font-size', currentFontSize + 'pt'); document.getElementById('font-size-display').innerText = currentFontSize + 'pt'; }
+        function changeIlluSize(delta) { currentIlluSize += delta; if (currentIlluSize < 100) currentIlluSize = 600; document.documentElement.style.setProperty('--illu-size', currentIlluSize + 'px'); document.getElementById('illu-size-display').innerText = currentIlluSize + 'px'; }
+        function toggleWidth() { isExpanded = !isExpanded; document.body.style.maxWidth = isExpanded ? '100%' : '950px'; }
+        function toggleFullScreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(err => { alert(err.message); }); } else { if (document.exitFullscreen) { document.exitFullscreen(); } } }
+
+        // --- BỘ NHỚ LÕI & TIỆN ÍCH ---
+        let questionCounter = 1;
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+
+        // ================= HÀM SINH CÂU HỎI ĐỘNG (GENERATIVE) =================
+        
+        function genT1_Length() {
+            let a = Math.floor(Math.random() * 20) + 10; // 10 to 29
+            let length = Math.floor(Math.random() * 5) + 3; // 3 to 7
+            let b = a + length;
+            
+            let ans = length;
+            let f1 = length + 1;
+            let f2 = a + b;
+            let f3 = b - a - 1;
+            
+            let q_id = "t1_q" + Date.now() + Math.random().toString(36).substring(7);
+            
+            let opts = shuffle([
+                `<li><label><input type="radio" name="${q_id}" value="true"> ${ans}</label></li>`,
+                `<li><label><input type="radio" name="${q_id}" value="false"> ${f1}</label></li>`,
+                `<li><label><input type="radio" name="${q_id}" value="false"> ${f2}</label></li>`,
+                `<li><label><input type="radio" name="${q_id}" value="false"> ${f3}</label></li>`
+            ]).join("");
+
+            return `<div class="question type1-q"><p><b>Câu ${questionCounter++}:</b> Độ dài của nhóm số liệu $[${a}; ${b})$ là bao nhiêu?</p><ul class="options">${opts}</ul></div>`;
+        }
+
+        function genT1_Range() {
+            let max = Math.floor(Math.random() * 50) + 50; // 50 to 99
+            let min = Math.floor(Math.random() * 20) + 10; // 10 to 29
+            let range = max - min;
+            
+            let q_id = "t1_q" + Date.now() + Math.random().toString(36).substring(7);
+            let opts = shuffle([
+                `<li><label><input type="radio" name="${q_id}" value="true"> ${range}</label></li>`,
+                `<li><label><input type="radio" name="${q_id}" value="false"> ${max + min}</label></li>`,
+                `<li><label><input type="radio" name="${q_id}" value="false"> ${max}</label></li>`,
+                `<li><label><input type="radio" name="${q_id}" value="false"> ${min}</label></li>`
+            ]).join("");
+            return `<div class="question type1-q"><p><b>Câu ${questionCounter++}:</b> Cho một mẫu số liệu có giá trị lớn nhất là ${max} và giá trị nhỏ nhất là ${min}. Khoảng biến thiên của mẫu số liệu đó là:</p><ul class="options">${opts}</ul></div>`;
+        }
+
+        function genT1_Theory() {
+            let statements = [
+                { t: "Tổng độ dài các nhóm phải lớn hơn khoảng biến thiên.", a: "true" },
+                { t: "Các nhóm số liệu có thể giao nhau.", a: "false" },
+                { t: "Nhóm số liệu luôn luôn phải lấy đầu mút bên phải.", a: "false" },
+                { t: "Nên chia thành càng nhiều nhóm càng tốt để tăng tính chính xác.", a: "false" }
+            ];
+            
+            let q_id = "t1_q" + Date.now() + Math.random().toString(36).substring(7);
+            
+            // Xây dựng câu hỏi tìm câu ĐÚNG
+            let correctOpt = statements[0].t;
+            let falseOpts = [statements[1].t, statements[2].t, statements[3].t];
+            
+            let opts = shuffle([
+                `<li><label><input type="radio" name="${q_id}" value="true"> ${correctOpt}</label></li>`,
+                `<li><label><input type="radio" name="${q_id}" value="false"> ${falseOpts[0]}</label></li>`,
+                `<li><label><input type="radio" name="${q_id}" value="false"> ${falseOpts[1]}</label></li>`,
+                `<li><label><input type="radio" name="${q_id}" value="false"> ${falseOpts[2]}</label></li>`
+            ]).join("");
+            return `<div class="question type1-q"><p><b>Câu ${questionCounter++}:</b> Khẳng định nào sau đây là <b>đúng</b> khi tiến hành ghép nhóm mẫu số liệu?</p><ul class="options">${opts}</ul></div>`;
+        }
+
+        function genT1_Frequency() {
+            let f1 = Math.floor(Math.random() * 10) + 5;
+            let f2 = Math.floor(Math.random() * 15) + 10;
+            let f3 = Math.floor(Math.random() * 8) + 2;
+            let total = f1 + f2 + f3;
+            
+            let q_id = "t1_q" + Date.now() + Math.random().toString(36).substring(7);
+            
+            let opts = shuffle([
+                `<li><label><input type="radio" name="${q_id}" value="true"> ${total}</label></li>`,
+                `<li><label><input type="radio" name="${q_id}" value="false"> ${total - 1}</label></li>`,
+                `<li><label><input type="radio" name="${q_id}" value="false"> ${total + 2}</label></li>`,
+                `<li><label><input type="radio" name="${q_id}" value="false"> ${Math.max(f1, f2, f3)}</label></li>`
+            ]).join("");
+            return `<div class="question type1-q"><p><b>Câu ${questionCounter++}:</b> Một bảng tần số ghép nhóm có 3 nhóm với tần số tương ứng là ${f1}, ${f2} và ${f3}. Kích thước mẫu (tổng số số liệu) bằng bao nhiêu?</p><ul class="options">${opts}</ul></div>`;
+        }
+
+        // ================= DẠNG 2: ĐÚNG / SAI ĐỘNG =================
+        const t2_bank = [
+            { t: "Độ dài của nhóm $[15; 20)$ là 5.", a: "true" },
+            { t: "Nhóm $[a; b)$ chứa các giá trị từ $a$ đến $b$, bao gồm cả $b$.", a: "false" },
+            { t: "Mẫu số liệu ghép nhóm luôn chia thành các nhóm có độ dài bằng nhau.", a: "false" }, // Khuyến khích bằng nhau chứ k bắt buộc hoàn toàn trong mọi TH, nhưng SGK ghi "nên có độ dài bằng nhau" -> "luôn luôn" là sai
+            { t: "Khoảng biến thiên của mẫu số liệu là hiệu số giữa giá trị lớn nhất và giá trị nhỏ nhất.", a: "true" },
+            { t: "Tổng độ dài các nhóm cần phải nhỏ hơn khoảng biến thiên của mẫu số liệu.", a: "false" },
+            { t: "Trong bảng tần số, nhóm cuối cùng có thể lấy đầu mút bên phải thành đoạn $[a; b]$.", a: "true" },
+            { t: "Việc ghép nhóm số liệu giúp dễ hình dung tổng thể biểu đồ hơn so với dữ liệu thô lớn.", a: "true" },
+            { t: "Độ dài của nhóm $[2.5; 3.0)$ là 0.5.", a: "true" },
+            { t: "Các nhóm trong một mẫu số liệu ghép nhóm được phép giao nhau (có phần chung).", a: "false" },
+            { t: "Tần số của một nhóm là số lượng các giá trị của mẫu số liệu rơi vào nhóm đó.", a: "true" },
+            { t: "Nhóm $[10; 20)$ và nhóm $[20; 30)$ là hai nhóm giao nhau tại điểm 20.", a: "false" },
+            { t: "Nếu giá trị nhỏ nhất là 10, lớn nhất là 55, thì khoảng biến thiên là 45.", a: "true" }
+        ];
+
+        let t2_shuffled = []; let t2_index = 0;
+
+        function genT2() {
+            if (t2_shuffled.length === 0 || t2_index > t2_shuffled.length - 4) {
+                t2_shuffled = shuffle([...t2_bank]);
+                t2_index = 0;
+            }
+            let q_id = "t2_q" + Date.now() + Math.random().toString(36).substring(7);
+            let selected = t2_shuffled.slice(t2_index, t2_index + 4);
+            t2_index += 4;
+            
+            let trs = selected.map((item, idx) => {
+                let letter = String.fromCharCode(97 + idx);
+                return `<tr data-ans="${item.a}">
+                            <td>${letter}) ${item.t}</td>
+                            <td><input type="radio" name="${q_id}_${letter}" value="true"></td>
+                            <td><input type="radio" name="${q_id}_${letter}" value="false"></td>
+                            <td class="feedback"></td>
+                        </tr>`;
+            }).join("");
+
+            return `
+            <div class="question type2-q">
+                <p><b>Câu ${questionCounter++}:</b> Các mệnh đề sau về mẫu số liệu ghép nhóm đúng hay sai?</p>
+                <div class="table-responsive">
+                    <table class="tf-table">
+                        <tr><th>Mệnh đề</th><th>Đúng</th><th>Sai</th><th>Kết quả</th></tr>
+                        ${trs}
+                    </table>
+                </div>
+            </div>`;
+        }
+
+        // ================= DẠNG 3: TRẢ LỜI NGẮN TỰ ĐỘNG CHẤM =================
+        function genT3_1() {
+            let a = Math.floor(Math.random() * 100); 
+            let b = a + Math.floor(Math.random() * 20) + 5; 
+            
+            return `
+            <div class="question type3-q">
+                <p><b>Câu ${questionCounter++}:</b> Một nhóm số liệu thống kê chiều cao được xác định là $[${a}; ${b})$. Hãy tính độ dài của nhóm số liệu này.</p>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <b>Đáp án:</b> <input type="text" class="short-ans-input" data-ans="${b - a}" placeholder="Nhập số...">
+                    <span class="feedback"></span>
+                </div>
+            </div>`;
+        }
+
+        function genT3_2() {
+            let minVal = Math.floor(Math.random() * 30) + 10;
+            let maxVal = minVal + Math.floor(Math.random() * 40) + 20;
+            
+            return `
+            <div class="question type3-q">
+                <p><b>Câu ${questionCounter++}:</b> Bảng điểm thi Toán của một trường có điểm thấp nhất là ${minVal} và điểm cao nhất là ${maxVal}. Tính khoảng biến thiên của mẫu số liệu điểm thi này.</p>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <b>Đáp án:</b> <input type="text" class="short-ans-input" data-ans="${maxVal - minVal}" placeholder="Nhập số...">
+                    <span class="feedback"></span>
+                </div>
+            </div>`;
+        }
+
+        function genT3_3() {
+            let f1 = Math.floor(Math.random() * 20) + 10;
+            let f2 = Math.floor(Math.random() * 30) + 20;
+            let f3 = Math.floor(Math.random() * 10) + 5;
+            let total = f1 + f2 + f3;
+            
+            return `
+            <div class="question type3-q">
+                <p><b>Câu ${questionCounter++}:</b> Biểu diễn cân nặng của các học sinh trong lớp thành 3 nhóm. Biết số học sinh thuộc nhóm 1, nhóm 2 và nhóm 3 lần lượt là ${f1}, ${f2} và ${f3}. Lớp học có tất cả bao nhiêu học sinh?</p>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <b>Đáp án:</b> <input type="text" class="short-ans-input" data-ans="${total}" placeholder="Nhập số nguyên...">
+                    <span class="feedback"></span>
+                </div>
+            </div>`;
+        }
+
+        // ================= ĐIỀU KHIỂN & CHẤM ĐIỂM =================
+        function generateTest() {
+            try {
+                let n1 = parseInt(document.getElementById('numType1').value);
+                let n2 = parseInt(document.getElementById('numType2').value);
+                let n3 = parseInt(document.getElementById('numType3').value);
+                let testContent = document.getElementById('test-content');
+                
+                document.getElementById('output').style.display = 'block';
+                document.getElementById('submitBtn').style.display = 'inline-block';
+                document.getElementById('score-display').innerHTML = '';
+                document.getElementById('advice-display').style.display = 'none';
+                questionCounter = 1; let finalHtml = ""; 
+
+                if (n1 > 0) {
+                    finalHtml += "<h3>Phần I: Câu trắc nghiệm nhiều phương án lựa chọn</h3>";
+                    let t1_funcs = shuffle([genT1_Length, genT1_Range, genT1_Theory, genT1_Frequency]);
+                    for (let i = 0; i < n1; i++) { finalHtml += t1_funcs[i % t1_funcs.length](); }
+                }
+                if (n2 > 0) {
+                    finalHtml += "<h3 style='margin-top:25px;'>Phần II: Câu trắc nghiệm đúng sai</h3>";
+                    t2_shuffled = []; // Reset bộ đệm Đúng Sai
+                    for (let i = 0; i < n2; i++) { finalHtml += genT2(); }
+                }
+                if (n3 > 0) {
+                    finalHtml += "<h3 style='margin-top:25px;'>Phần III: Câu trắc nghiệm trả lời ngắn</h3>";
+                    let t3_funcs = shuffle([genT3_1, genT3_2, genT3_3]);
+                    for (let i = 0; i < n3; i++) { finalHtml += t3_funcs[i % t3_funcs.length](); }
+                }
+
+                testContent.innerHTML = finalHtml; 
+                
+                if (window.MathJax && MathJax.typesetPromise) {
+                    MathJax.typesetClear([testContent]);
+                    MathJax.typesetPromise([testContent]).catch(function (err) { console.error(err.message); });
+                }
+                document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (error) {
+                console.error("Lỗi khi tạo đề:", error);
+                alert("Đã xảy ra lỗi kỹ thuật. Vui lòng nhấn Tạo Đề lại!");
+            }
+        }
+
+        function checkAnswers() {
+            let totalScore = 0; let maxScore = 0;
+            
+            // Dạng 1
+            document.querySelectorAll('.type1-q').forEach(q => { 
+                maxScore++; 
+                let radios = q.querySelectorAll('input[type="radio"]'); 
+                let answered = false; 
+                radios.forEach(radio => { 
+                    let li = radio.closest('li'); 
+                    li.classList.remove('is-correct', 'is-incorrect'); 
+                    li.style.border = "1px solid transparent"; 
+                    if (radio.checked) { 
+                        answered = true; 
+                        if (radio.value === "true") { li.classList.add('is-correct'); totalScore++; } 
+                        else { li.classList.add('is-incorrect'); } 
+                    } 
+                    if (radio.value === "true" && answered) li.style.border = "2px solid var(--correct-border)"; 
+                }); 
+            });
+            
+            // Dạng 2
+            document.querySelectorAll('.type2-q tr[data-ans]').forEach(row => { 
+                maxScore++; 
+                let correctAns = row.getAttribute('data-ans'), radios = row.querySelectorAll('input[type="radio"]'), feedback = row.querySelector('.feedback'); 
+                row.classList.remove('is-correct', 'is-incorrect'); feedback.innerHTML = ""; 
+                let checkedVal = null; 
+                radios.forEach(r => { if (r.checked) checkedVal = r.value; }); 
+                if (checkedVal !== null) { 
+                    if (checkedVal === correctAns) { 
+                        row.classList.add('is-correct'); feedback.innerHTML = "✔ĐÚNG"; feedback.className = "feedback text-correct"; totalScore++; 
+                    } else { 
+                        row.classList.add('is-incorrect'); feedback.innerHTML = `✘ SAI (Đ.Án: ${correctAns === "true" ? "Đúng" : "Sai"})`; feedback.className = "feedback text-incorrect"; 
+                    } 
+                } 
+            });
+            
+            // Dạng 3 (Bộ phân tích thông minh cho Phân số và Thập phân)
+            document.querySelectorAll('.short-ans-input').forEach(input => { 
+                maxScore++; 
+                let correctAns = parseFloat(input.getAttribute('data-ans'));
+                let userAnsStr = input.value.trim().replace(',', '.');
+                let userAns;
+                
+                if (userAnsStr.includes('/')) {
+                    let parts = userAnsStr.split('/');
+                    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) && parseFloat(parts[1]) !== 0) {
+                        userAns = parseFloat(parts[0]) / parseFloat(parts[1]);
+                    } else {
+                        userAns = NaN;
+                    }
+                } else {
+                    userAns = parseFloat(userAnsStr);
+                }
+
+                let feedback = input.nextElementSibling; 
+                input.classList.remove('is-correct', 'is-incorrect'); 
+                
+                if (userAnsStr !== "") { 
+                    if (!isNaN(userAns) && Math.abs(userAns - correctAns) < 1e-5) { 
+                        input.classList.add('is-correct'); feedback.innerHTML = "✔ CHÍNH XÁC"; feedback.className = "feedback text-correct"; totalScore++; 
+                    } else { 
+                        input.classList.add('is-incorrect'); feedback.innerHTML = `✘ SAI`; feedback.className = "feedback text-incorrect"; 
+                    } 
+                } 
+            });
+            
+            let percent = maxScore === 0 ? 0 : Math.round((totalScore/maxScore)*100);
+            let scoreDisplay = document.getElementById('score-display'); let adviceBox = document.getElementById('advice-display');
+            scoreDisplay.innerHTML = `Bạn đã đạt: ${totalScore} / ${maxScore} điểm (${percent}%)`; adviceBox.style.display = 'block';
+            
+            if (percent < 50) { 
+                adviceBox.style.backgroundColor = '#f8d7da'; adviceBox.style.color = '#721c24'; adviceBox.innerHTML = "Hãy ôn tập lại kỹ phần khái niệm, độ dài nhóm và khoảng biến thiên nhé!"; 
+            } else if (percent < 80) { 
+                adviceBox.style.backgroundColor = '#fff3cd'; adviceBox.style.color = '#856404'; adviceBox.innerHTML = "Khá tốt! Bạn cần đọc thật cẩn thận phần phân biệt khoảng và đoạn ở đầu mút nhóm."; 
+            } else { 
+                adviceBox.style.backgroundColor = '#d4edda'; adviceBox.style.color = '#155724'; adviceBox.innerHTML = "Xuất sắc! Bạn đã nắm rất vững kiến thức về Mẫu số liệu ghép nhóm!"; 
+            }
+            document.getElementById('score-display').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    </script>
+</body>
+</html>
